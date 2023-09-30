@@ -47,7 +47,7 @@ pols_month_df =
     
 Second, I will clean the data in snp.csv.
 
-```{r}
+```{r snp_df}
 snp_df =
   read.csv("Data/snp.csv") |>
   separate(date, into = c("month", "day", "year"), sep = "/") |>
@@ -70,7 +70,7 @@ snp_df =
     
 Third, I will tidy the data in unemployment.csv.
 
-```{r}
+```{r unemployment_df}
 unemployment_df =
   read.csv("Data/unemployment.csv") |>
   janitor::clean_names() |>
@@ -85,5 +85,38 @@ unemployment_df =
 Now, I will join the three datasets into a single data frame.
 
 # Problem 2
+
+First, I will import and clean the Mr. Trash Wheel dataset.
+
+```{r mr_trash_wheel_df}
+
+library(readxl)
+
+mr_trash_wheel_df =
+  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", skip = 1) |>
+  janitor::clean_names()
+```
+
+Second, I will import and clean the Professor Trash Wheel dataset.
+
+```{r prof_trash_wheel_df}
+
+library(readxl)
+
+prof_trash_wheel_df =
+  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", skip = 1) |>
+  janitor::clean_names()
+```
+
+Third, I will import and clean the Professor Trash Wheel dataset.
+
+```{r gwynnda_trash_wheel_df}
+
+library(readxl)
+
+gwynnda_trash_wheel_df =
+  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", skip = 1) |>
+  janitor::clean_names()
+```
 
 # Problem 3
