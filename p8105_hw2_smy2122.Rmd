@@ -1,0 +1,20 @@
+---
+title: "p8105_hw2_smy2122"
+author: "Sarah Younes"
+date: "2023-09-30"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+As always, I will begin by loading the tidyverse.
+
+```{r tidyverse}
+library(tidyverse)
+```
+
+# Problem 1
+
+# Problem 2
