@@ -49,14 +49,34 @@ Second, I will clean the data in snp.csv.
 
 ```{r}
 snp_df =
-  read.csv("Data/snp.csv")
+  read.csv("Data/snp.csv") |>
+  separate(date, into = c("month", "day", "year"), sep = "/") |>
+  mutate(
+     month = replace(month, month == "1", "January"),
+     month = replace(month, month == "2", "February"),
+     month = replace(month, month == "3", "March"),
+     month = replace(month, month == "4", "April"),
+     month = replace(month, month == "5", "May"),
+     month = replace(month, month == "6", "June"),
+     month = replace(month, month == "7", "July"),
+     month = replace(month, month == "8", "August"),
+     month = replace(month, month == "9", "September"),
+     month = replace(month, month == "10", "October"),
+     month = replace(month, month == "11", "November"),
+     month = replace(month, month == "12", "December")
+  )
 ```
     
 Third, I will tidy the data in unemployment.csv.
 
 ```{r}
 unemployment_df =
-  read.csv("Data/unemployment.csv")
+  read.csv("Data/unemployment.csv") |>
+  pivot_longer(
+    Jan:Dec,
+    names_to = "month",
+    values_to = "unemployment"
+  )
 ```
 
 Now, I will join the three datasets into a single data frame.
