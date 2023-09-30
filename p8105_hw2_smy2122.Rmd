@@ -1,7 +1,6 @@
 ---
-title: "p8105_hw2_smy2122"
+title: "Homework 2"
 author: "Sarah Younes"
-date: "2023-09-30"
 output: github_document
 ---
 
@@ -11,10 +10,57 @@ knitr::opts_chunk$set(echo = TRUE)
 
 As always, I will begin by loading the tidyverse.
 
-```{r tidyverse}
+```{r tidyverse, message = FALSE}
 library(tidyverse)
 ```
 
 # Problem 1
 
+First, I will clean the data in pols-month.csv.
+
+```{r pols_month_df}
+pols_month_df =
+  read.csv("Data/pols-month.csv") |>
+  separate(mon, into = c("year", "month", "day"), sep = "-") |>
+  mutate(
+     month = replace(month, month == "01", "January"),
+     month = replace(month, month == "02", "February"),
+     month = replace(month, month == "03", "March"),
+     month = replace(month, month == "04", "April"),
+     month = replace(month, month == "05", "May"),
+     month = replace(month, month == "06", "June"),
+     month = replace(month, month == "07", "July"),
+     month = replace(month, month == "08", "August"),
+     month = replace(month, month == "09", "September"),
+     month = replace(month, month == "10", "October"),
+     month = replace(month, month == "11", "November"),
+     month = replace(month, month == "12", "December")
+  ) |>
+  mutate(
+    president = prez_gop) |>
+  mutate(
+    president = replace(president, president == "1", "Republican"),
+    president = replace(president, president == "0", "Democrat")
+  ) |>
+  select(year, month, president, gov_gop, sen_gop, rep_gop, gov_dem, sen_dem, rep_dem)
+```
+    
+Second, I will clean the data in snp.csv.
+
+```{r}
+snp_df =
+  read.csv("Data/snp.csv")
+```
+    
+Third, I will tidy the data in unemployment.csv.
+
+```{r}
+unemployment_df =
+  read.csv("Data/unemployment.csv")
+```
+
+Now, I will join the three datasets into a single data frame.
+
 # Problem 2
+
+# Problem 3
