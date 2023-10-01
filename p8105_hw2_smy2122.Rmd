@@ -89,24 +89,67 @@ First, I will load the `readxl` package and import and clean the Mr. Trash Wheel
 library(readxl)
 
 mr_trash_wheel_df =
-  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N549") |>
-  janitor::clean_names()
+  read_excel("Data/202207 Trash Wheel Collection Data.xlsx",
+    sheet = 1,
+    range = "A2:M549",
+    na = "",
+    col_types = c("numeric", "text", "numeric", "date", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric")
+    ) |>
+  janitor::clean_names() |>
+  rename(weight = weight_tons, volume = volume_cubic_yards) |>
+  mutate(
+    homes_powered = (weight*500)/30
+  ) |>
+  mutate(
+    trash_wheel = "mr. trash wheel"
+  )
 ```
 
 Second, I will import and clean the Professor Trash Wheel dataset.
 
 ```{r prof_trash_wheel_df}
 prof_trash_wheel_df =
-  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M96") |>
-  janitor::clean_names()
+  read_excel(
+    "Data/202207 Trash Wheel Collection Data.xlsx",
+    sheet = 2,
+    range = "A2:L96",
+    na = "") |>
+  janitor::clean_names() |>
+  rename(
+    weight = weight_tons,
+    volume = volume_cubic_yards) |>
+  mutate(
+    homes_powered = (weight*500)/30
+  ) |>
+  mutate(
+    trash_wheel = "professor trash wheel"
+  )
 ```
 
 Third, I will import and clean the Professor Trash Wheel dataset.
 
 ```{r gwynnda_trash_wheel_df}
 gwynnda_trash_wheel_df =
-  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:K108") |>
-  janitor::clean_names()
+  read_excel(
+    "Data/202207 Trash Wheel Collection Data.xlsx",
+    sheet = 4,
+    range = "A2:J108",
+    na = "") |>
+  janitor::clean_names() |>
+  rename(
+    weight = weight_tons,
+    volume = volume_cubic_yards) |>
+  mutate(
+    homes_powered = (weight*500)/30
+  ) |>
+  mutate(
+    trash_wheel = "gwynnda trash wheel"
+  )
+```
+
+```{r merge}
+merged_trash_wheel_df =
+  bind_rows(mr_trash_wheel_df, prof_trash_wheel_df, gwynnda_trash_wheel_df)
 ```
 
 # Problem 3
