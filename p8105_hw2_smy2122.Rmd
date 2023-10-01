@@ -23,26 +23,22 @@ pols_month_df =
   read.csv("Data/pols-month.csv") |>
   separate(mon, into = c("year", "month", "day"), sep = "-") |>
   mutate(
-     month = replace(month, month == "01", "Jan"),
-     month = replace(month, month == "02", "Feb"),
-     month = replace(month, month == "03", "Mar"),
-     month = replace(month, month == "04", "Apr"),
-     month = replace(month, month == "05", "May"),
-     month = replace(month, month == "06", "Jun"),
-     month = replace(month, month == "07", "Jul"),
-     month = replace(month, month == "08", "Aug"),
-     month = replace(month, month == "09", "Sep"),
-     month = replace(month, month == "10", "Oct"),
-     month = replace(month, month == "11", "Nov"),
-     month = replace(month, month == "12", "Dec")
+     month = rename(month, month == "01", "Jan"),
+     month = rename(month, month == "02", "Feb"),
+     month = rename(month, month == "03", "Mar"),
+     month = rename(month, month == "04", "Apr"),
+     month = rename(month, month == "05", "May"),
+     month = rename(month, month == "06", "Jun"),
+     month = rename(month, month == "07", "Jul"),
+     month = rename(month, month == "08", "Aug"),
+     month = rename(month, month == "09", "Sep"),
+     month = rename(month, month == "10", "Oct"),
+     month = rename(month, month == "11", "Nov"),
+     month = rename(month, month == "12", "Dec")
   ) |>
   mutate(
-    president = prez_gop) |>
-  mutate(
-    president = replace(president, president == "1", "Republican"),
-    president = replace(president, president == "0", "Democrat")
-  ) |>
-  select(year, month, president, gov_gop, sen_gop, rep_gop, gov_dem, sen_dem, rep_dem)
+    president = recode(prez_gop, "0" = "dem", "1" = "gop", "2" = "gop")) |>
+  select(year, month, everything(), -day, -starts_with("prez"))
 ```
     
 Second, I will clean the data in snp.csv.
@@ -52,30 +48,30 @@ snp_df =
   read.csv("Data/snp.csv") |>
   separate(date, into = c("month", "day", "year"), sep = "/") |>
   mutate(
-     month = replace(month, month == "1", "Jan"),
-     month = replace(month, month == "2", "Feb"),
-     month = replace(month, month == "3", "Mar"),
-     month = replace(month, month == "4", "Apr"),
-     month = replace(month, month == "5", "May"),
-     month = replace(month, month == "6", "Jun"),
-     month = replace(month, month == "7", "Jul"),
-     month = replace(month, month == "8", "Aug"),
-     month = replace(month, month == "9", "Sep"),
-     month = replace(month, month == "10", "Oct"),
-     month = replace(month, month == "11", "Nov"),
-     month = replace(month, month == "12", "Dec")
+     month = rename(month, month == "1", "Jan"),
+     month = rename(month, month == "2", "Feb"),
+     month = rename(month, month == "3", "Mar"),
+     month = rename(month, month == "4", "Apr"),
+     month = rename(month, month == "5", "May"),
+     month = rename(month, month == "6", "Jun"),
+     month = rename(month, month == "7", "Jul"),
+     month = rename(month, month == "8", "Aug"),
+     month = rename(month, month == "9", "Sep"),
+     month = rename(month, month == "10", "Oct"),
+     month = rename(month, month == "11", "Nov"),
+     month = rename(month, month == "12", "Dec")
   ) |>
   select(year, month, close)
 ```
-    
+   
 Third, I will tidy the data in unemployment.csv.
 
 ```{r unemployment_df}
 unemployment_df =
   read.csv("Data/unemployment.csv") |>
-  janitor::clean_names() |>
+  rename(year = Year) |>
   pivot_longer(
-    jan:dec,
+    Jan:Dec,
     names_to = "month",
     values_to = "unemployment"
   ) |>
@@ -86,37 +82,32 @@ Now, I will join the three datasets into a single data frame.
 
 # Problem 2
 
-First, I will import and clean the Mr. Trash Wheel dataset.
+First, I will load the `readxl` package and import and clean the Mr. Trash Wheel dataset.
 
 ```{r mr_trash_wheel_df}
 
 library(readxl)
 
 mr_trash_wheel_df =
-  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", skip = 1) |>
+  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N549") |>
   janitor::clean_names()
 ```
 
 Second, I will import and clean the Professor Trash Wheel dataset.
 
 ```{r prof_trash_wheel_df}
-
-library(readxl)
-
 prof_trash_wheel_df =
-  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", skip = 1) |>
+  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Professor Trash Wheel", range = "A2:M96") |>
   janitor::clean_names()
 ```
 
 Third, I will import and clean the Professor Trash Wheel dataset.
 
 ```{r gwynnda_trash_wheel_df}
-
-library(readxl)
-
 gwynnda_trash_wheel_df =
-  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", skip = 1) |>
+  read_excel("Data/202207 Trash Wheel Collection Data.xlsx", sheet = "Gwynnda Trash Wheel", range = "A2:K108") |>
   janitor::clean_names()
 ```
 
 # Problem 3
+
