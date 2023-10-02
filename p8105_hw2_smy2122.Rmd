@@ -8,10 +8,11 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-As always, I will begin by loading the tidyverse.
+As always, I will begin by loading the tidyverse, and I will additionally load `readxl` for Problem 2.
 
 ```{r tidyverse, message = FALSE}
 library(tidyverse)
+library(readxl)
 ```
 
 # Problem 1
@@ -20,24 +21,27 @@ First, I will clean the data in pols-month.csv.
 
 ```{r pols_month_df}
 pols_month_df =
-  read.csv("Data/pols-month.csv") |>
+  read.csv("./Data/fivethirtyeight_data/pols-month.csv") |>
   separate(mon, into = c("year", "month", "day"), sep = "-") |>
   mutate(
-     month = rename(month, month == "01", "Jan"),
-     month = rename(month, month == "02", "Feb"),
-     month = rename(month, month == "03", "Mar"),
-     month = rename(month, month == "04", "Apr"),
-     month = rename(month, month == "05", "May"),
-     month = rename(month, month == "06", "Jun"),
-     month = rename(month, month == "07", "Jul"),
-     month = rename(month, month == "08", "Aug"),
-     month = rename(month, month == "09", "Sep"),
-     month = rename(month, month == "10", "Oct"),
-     month = rename(month, month == "11", "Nov"),
-     month = rename(month, month == "12", "Dec")
+     month = replace(month, month == "01", "Jan"),
+     month = replace(month, month == "02", "Feb"),
+     month = replace(month, month == "03", "Mar"),
+     month = replace(month, month == "04", "Apr"),
+     month = replace(month, month == "05", "May"),
+     month = replace(month, month == "06", "Jun"),
+     month = replace(month, month == "07", "Jul"),
+     month = replace(month, month == "08", "Aug"),
+     month = replace(month, month == "09", "Sep"),
+     month = replace(month, month == "10", "Oct"),
+     month = replace(month, month == "11", "Nov"),
+     month = replace(month, month == "12", "Dec")
   ) |>
   mutate(
     president = recode(prez_gop, "0" = "dem", "1" = "gop", "2" = "gop")) |>
+  mutate(
+    year = as.integer(year)
+  ) |>
   select(year, month, everything(), -day, -starts_with("prez"))
 ```
     
@@ -45,21 +49,24 @@ Second, I will clean the data in snp.csv.
 
 ```{r snp_df}
 snp_df =
-  read.csv("Data/snp.csv") |>
+  read.csv("./Data/fivethirtyeight_data/snp.csv") |>
   separate(date, into = c("month", "day", "year"), sep = "/") |>
   mutate(
-     month = rename(month, month == "1", "Jan"),
-     month = rename(month, month == "2", "Feb"),
-     month = rename(month, month == "3", "Mar"),
-     month = rename(month, month == "4", "Apr"),
-     month = rename(month, month == "5", "May"),
-     month = rename(month, month == "6", "Jun"),
-     month = rename(month, month == "7", "Jul"),
-     month = rename(month, month == "8", "Aug"),
-     month = rename(month, month == "9", "Sep"),
-     month = rename(month, month == "10", "Oct"),
-     month = rename(month, month == "11", "Nov"),
-     month = rename(month, month == "12", "Dec")
+     month = replace(month, month == "1", "Jan"),
+     month = replace(month, month == "2", "Feb"),
+     month = replace(month, month == "3", "Mar"),
+     month = replace(month, month == "4", "Apr"),
+     month = replace(month, month == "5", "May"),
+     month = replace(month, month == "6", "Jun"),
+     month = replace(month, month == "7", "Jul"),
+     month = replace(month, month == "8", "Aug"),
+     month = replace(month, month == "9", "Sep"),
+     month = replace(month, month == "10", "Oct"),
+     month = replace(month, month == "11", "Nov"),
+     month = replace(month, month == "12", "Dec")
+  ) |>
+  mutate(
+    year = as.integer(year)
   ) |>
   select(year, month, close)
 ```
@@ -68,7 +75,7 @@ Third, I will tidy the data in unemployment.csv.
 
 ```{r unemployment_df}
 unemployment_df =
-  read.csv("Data/unemployment.csv") |>
+  read.csv("./Data/fivethirtyeight_data/unemployment.csv") |>
   rename(year = Year) |>
   pivot_longer(
     Jan:Dec,
@@ -80,36 +87,44 @@ unemployment_df =
 
 Now, I will join the three datasets into a single data frame.
 
+```{r merge problem 1}
+problem_1_df =
+  left_join(pols_month_df, snp_df) |>
+  left_join(x = _, y = unemployment_df)
+```
+
 # Problem 2
 
-First, I will load the `readxl` package and import and clean the Mr. Trash Wheel dataset.
+First, I will load the `readxl` package and import and clean the Mr. Trash Wheel dataset. Data cleaning for this dataset involves setting missing values, cleaning the variable names, renaming two existing variables, creating two new variables, and changing the column type for one existing variable.
 
 ```{r mr_trash_wheel_df}
-
-library(readxl)
-
 mr_trash_wheel_df =
   read_excel(
-    "Data/202207 Trash Wheel Collection Data.xlsx",
+    "./Data/trash_wheel_data/202207 Trash Wheel Collection Data.xlsx",
     sheet = 1,
     range = "A2:M549",
     na = "") |>
   janitor::clean_names() |>
-  rename(weight = weight_tons, volume = volume_cubic_yards) |>
+  rename(
+    weight = weight_tons,
+    volume = volume_cubic_yards) |>
   mutate(
     homes_powered = (weight*500)/30
   ) |>
   mutate(
     trash_wheel = "mr trash wheel"
+  ) |>
+  mutate(
+    year = as.integer(year)
   )
 ```
 
-Second, I will import and clean the Professor Trash Wheel dataset.
+Second, I will import and clean the Professor Trash Wheel dataset. Data cleaning for this dataset involves setting missing values, cleaning the variable names, renaming two existing variables, and creating two new variables.
 
 ```{r prof_trash_wheel_df}
 prof_trash_wheel_df =
   read_excel(
-    "Data/202207 Trash Wheel Collection Data.xlsx",
+    "./Data/trash_wheel_data/202207 Trash Wheel Collection Data.xlsx",
     sheet = 2,
     range = "A2:L96",
     na = "") |>
@@ -125,12 +140,12 @@ prof_trash_wheel_df =
   )
 ```
 
-Third, I will import and clean the Professor Trash Wheel dataset.
+Third, I will import and clean the Professor Trash Wheel dataset. Data cleaning for this dataset involves setting missing values, cleaning the variable names, renaming two existing variables, and creating two new variables.
 
 ```{r gwynnda_trash_wheel_df}
 gwynnda_trash_wheel_df =
   read_excel(
-    "Data/202207 Trash Wheel Collection Data.xlsx",
+    "./Data/trash_wheel_data/202207 Trash Wheel Collection Data.xlsx",
     sheet = 4,
     range = "A2:J108",
     na = "") |>
@@ -146,19 +161,24 @@ gwynnda_trash_wheel_df =
   )
 ```
 
-```{r merge}
+Finally, I will merge all three datasets by using `bind_rows` instead of another join or merge type because most of the column names are consistent across datasets and rows just need to be added to create one horizontally-longer dataset.
+
+```{r merge problem 2}
 merged_trash_wheel_df =
-  bind_rows(mr_trash_wheel_df, prof_trash_wheel_df, gwynnda_trash_wheel_df)
+  bind_rows(mr_trash_wheel_df, prof_trash_wheel_df, gwynnda_trash_wheel_df) |>
+  select(trash_wheel, everything())
 ```
+
+Each dataset describes trash collected by different trash wheels around Baltimore, Maryland. The first dataset in this problem, Mr. Trash Wheel, contains `r nrow(mr_trash_wheel_df)` rows and `r ncol(mr_trash_wheel_df)` columns. The second dataset in this problem, Professor Trash Wheel, contains `r nrow(prof_trash_wheel_df)` rows and `r ncol(prof_trash_wheel_df)` columns. The third dataset in this problem, Gwynnda Trash Wheel, contains `r nrow(gwynnda_trash_wheel_df)` rows and `r ncol(gwynnda_trash_wheel_df)` columns. Each row represents one different dumpster that the trash wheel picks up trash from; thus, Mr. Trash Wheel collects trash from the most dumpsters, followed by Gwynnda Trash Wheel and Professor Trash Wheel. The columns for each dataset tell us the `date` of trash collection, `weight` (in tons) and `volume` (in cubic yards) of that dumpster's trash, and different types of trash that the trash wheels have collected, such as `plastic bottles` and `grocery bags`.
 
 # Problem 3
 
-First, I will import and clean the dataset of baseline demographics.
+First, I will import and clean the dataset of baseline demographics. The goal of this dataset is to identify whether participants qualified for the study and were carriers.
 
 ```{r}
 demographics_df =
   read.csv(
-    "Data/data_mci/MCI_baseline.csv",
+    "./Data/data_mci/MCI_baseline.csv",
     skip = 1,
     na = "."
   ) |>
@@ -187,9 +207,10 @@ Second, I will import and clean the dataset of longitudinally observed biomarker
 ```{r amyloid_df}
 amyloid_df =
   read.csv(
-    "Data/data_mci/mci_amyloid.csv",
+    "./Data/data_mci/mci_amyloid.csv",
     skip = 1,
     na = c("NA", "Na")
   ) |>
-  janitor::clean_names()
+  janitor::clean_names() |>
+  rename(id = study_id)
 ```
