@@ -89,19 +89,18 @@ First, I will load the `readxl` package and import and clean the Mr. Trash Wheel
 library(readxl)
 
 mr_trash_wheel_df =
-  read_excel("Data/202207 Trash Wheel Collection Data.xlsx",
+  read_excel(
+    "Data/202207 Trash Wheel Collection Data.xlsx",
     sheet = 1,
     range = "A2:M549",
-    na = "",
-    col_types = c("numeric", "text", "numeric", "date", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric")
-    ) |>
+    na = "") |>
   janitor::clean_names() |>
   rename(weight = weight_tons, volume = volume_cubic_yards) |>
   mutate(
     homes_powered = (weight*500)/30
   ) |>
   mutate(
-    trash_wheel = "mr. trash wheel"
+    trash_wheel = "mr trash wheel"
   )
 ```
 
@@ -154,3 +153,26 @@ merged_trash_wheel_df =
 
 # Problem 3
 
+First, I will import and clean the dataset of baseline demographics.
+
+```{r}
+demographic_df =
+  read.csv(
+    "Data/data_mci/MCI_baseline.csv",
+    skip = 1,
+    na = c(".", "")
+  ) |>
+  janitor::clean_names()
+```
+
+Second, I will import and clean the dataset of longitudinally observed biomarker values.
+
+```{r amyloid_df}
+amyloid_df =
+  read.csv(
+    "Data/data_mci/mci_amyloid.csv",
+    skip = 1,
+    na = c("NA", "Na")
+  ) |>
+  janitor::clean_names()
+```
