@@ -6,6 +6,7 @@ output: github_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+options("scipen" = 1000)
 ```
 
 As always, I will begin by loading the tidyverse, and I will additionally load `readxl` for Problem 2.
@@ -169,20 +170,22 @@ merged_trash_wheel_df =
   select(trash_wheel, everything())
 ```
 
-Each dataset describes trash collected by different trash wheels around Baltimore, Maryland from May 2014 to July 2022. The first dataset in this problem, Mr. Trash Wheel, contains `r nrow(mr_trash_wheel_df)` rows or observations and `r ncol(mr_trash_wheel_df)` columns. The second dataset in this problem, Professor Trash Wheel, contains `r nrow(prof_trash_wheel_df)` rows or observations and `r ncol(prof_trash_wheel_df)` columns. The third dataset in this problem, Gwynnda Trash Wheel, contains `r nrow(gwynnda_trash_wheel_df)` rows or observations and `r ncol(gwynnda_trash_wheel_df)` columns. Each row represents one different dumpster that the trash wheel picks up trash from; thus, Mr. Trash Wheel collects trash from the most dumpsters, followed by Gwynnda Trash Wheel and Professor Trash Wheel. The columns for each dataset tell us the `date` of trash collection, `weight` (in tons) and `volume` (in cubic yards) of that dumpster's trash, and different types of trash that the trash wheels have collected, such as `plastic bottles` and `grocery bags`. The merged dataset with all three trash wheels contains `r nrow(merged_trash_wheel_df)` rows or observations and `r ncol(merged_trash_wheel_df)` columns. Altogether, the three trash wheels collected `r sum(pull(merged_trash_wheel_df, weight))` tons of trash and `r sum(pull(merged_trash_wheel_df, volume))` cubic pounds of trash. Professor Trash Wheel alone collected `r filter(merged_trash_wheel_df, trash_wheel == "professor trash wheel") |> pull(weight) |> sum()` tons of trash. Altogether, the three trash wheels collected `r filter(merged_trash_wheel_df, month == "July", year == 2021) |> pull(cigarette_butts) |> sum()` cigarette butts in July of 2021, while Gwynnda Trash Wheel alone collected `r filter(merged_trash_wheel_df, month == "July", year == 2021, trash_wheel == "gwynnda trash wheel") |> pull(cigarette_butts) |> sum()` cigarette butts in July of 2021.
+Each dataset describes trash collected by different trash wheels around Baltimore, Maryland from May 2014 to July 2022. The first dataset in this problem, Mr. Trash Wheel, contains `r nrow(mr_trash_wheel_df)` rows or observations and `r ncol(mr_trash_wheel_df)` columns. The second dataset in this problem, Professor Trash Wheel, contains `r nrow(prof_trash_wheel_df)` rows or observations and `r ncol(prof_trash_wheel_df)` columns. The third dataset in this problem, Gwynnda Trash Wheel, contains `r nrow(gwynnda_trash_wheel_df)` rows or observations and `r ncol(gwynnda_trash_wheel_df)` columns. Each row represents one different dumpster that the trash wheel picks up trash from; thus, Mr. Trash Wheel collects trash from the most dumpsters, followed by Gwynnda Trash Wheel and Professor Trash Wheel. The columns for each dataset tell us the `date` of trash collection, `weight` (in tons) and `volume` (in cubic yards) of that dumpster's trash, and different types of trash that the trash wheels have collected, such as `plastic bottles` and `grocery bags`. The merged dataset with all three trash wheels contains `r nrow(merged_trash_wheel_df)` rows or observations and `r ncol(merged_trash_wheel_df)` columns. Altogether, the three trash wheels collected `r sum(pull(merged_trash_wheel_df, weight)) |> round(2)` tons of trash and `r sum(pull(merged_trash_wheel_df, volume)) |> round(2)` cubic pounds of trash. Professor Trash Wheel alone collected `r filter(merged_trash_wheel_df, trash_wheel == "professor trash wheel") |> pull(weight) |> sum() |> round(2)` tons of trash. Altogether, the three trash wheels collected `r filter(merged_trash_wheel_df, month == "July", year == 2021) |> pull(cigarette_butts) |> sum() |> round(2)` cigarette butts in July of 2021, while Gwynnda Trash Wheel alone collected `r filter(merged_trash_wheel_df, month == "July", year == 2021, trash_wheel == "gwynnda trash wheel") |> pull(cigarette_butts) |> sum() |> round(2)` cigarette butts in July of 2021. Additionally, the three trash wheels collectively powered `r sum(pull(merged_trash_wheel_df, homes_powered)) |> round(2)` homes.
 
 # Problem 3
 
-First, I will import and clean the dataset of baseline demographics. The goal of this dataset is to identify whether participants qualified for the study and were carriers.
+First, I will import and clean the dataset of baseline demographics. Data cleaning for this dataset first involves cleaning the variable names, renaming an existing variable, and recoding two existing variables, and removing participants who do not meet the inclusion criteria.
 
-```{r}
-demographics_df =
+```{r demographics_dfs}
+demographics_recruited_df =
   read.csv(
     "./Data/data_mci/MCI_baseline.csv",
     skip = 1,
     na = "."
   ) |>
   janitor::clean_names() |>
+  rename(
+    baseline_age = current_age) |>
   mutate(
     sex =
       case_match(
@@ -198,9 +201,16 @@ demographics_df =
         0 ~ "non carrier",
         1 ~ "carrier"),
         apoe4 = as.factor(apoe4)
-  ) |>
-    filter(is.na(age_at_onset))
+  )
+
+demographics_qualified_df =
+  demographics_recruited_df |>
+  filter(is.na(age_at_onset))
 ```
+
+The above dataset includes basic demographic information of potential and actual participants for the observational study. It includes only 6 variables collected at baseline: participants' study ID, current age, sex, years of education, whether they carry the APOE4 variant, and age at onset of Mild Cognitive Impairment (MCI). Arguably the most important use of this dataset is its ability to screen whether potential participants qualify of the study, since one of the major inclusion criteria is that participants must be free of MCI at baseline. Therefore, one of the most important steps in the import process was setting potential participants who did not have a baseline age at onset for MCI as missing (NA) and filtering out participants who had an age at onset for MCI (in other words, participants without an NA for age at onset). Before this process, a total of `r nrow(demographics_recruited_df)` participants were recruited for the observational study. However, only `r nrow(demographics_qualified_df)` participants qualified for the study since `r nrow(demographics_recruited_df) - nrow(demographics_qualified_df)` potential participants were discovered to have MCI at baseline. Among those who qualified, the average baseline age of participants was `r mean(pull(demographics_qualified_df, baseline_age))` years old.
+
+The proportion of women in the study who are APOE4 carriers is `r nrow(demographics_qualified_df, apoe4 == "carrier", sex == "female")`.
 
 Second, I will import and clean the dataset of longitudinally observed biomarker values.
 
@@ -213,4 +223,25 @@ amyloid_df =
   ) |>
   janitor::clean_names() |>
   rename(id = study_id)
+```
+
+Now, I will check if some participants appear in only the baseline or amyloid datasets by doing an anti-join.
+
+```{r anti-join}
+anti_join(demographics_qualified_df, amyloid_df, by = "id")
+```
+
+The output of the anti-join showed that 5 participants (IDs: 92, 179, 304, 389, 412) were in either the baseline or amyloid dataset but not both. Upon further investigation, all of these participants were in the baseline dataset but not the amyloid dataset, so it is likely that participants were recruited for and qualified for the study but ultimately decided not to continue participation in the study and withdraw.
+
+Now, I will combine the baseline and amyloid datasets so that only participants who appear in both datasets are retained.
+
+```{r merge problem 3}
+merged_alzheimers_df =
+  left_join(amyloid_df, demographics_qualified_df, by = "id")
+```
+
+Finally, I will export the resulting merged dataset as a CSV to my data directory.
+
+```{r export}
+write_csv(merged_alzheimers_df, "alzheimers_dataset.csv")
 ```
