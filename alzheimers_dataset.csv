@@ -1,4 +1,4 @@
-id,baseline,time_2,time_4,time_6,time_8,current_age,sex,education,apoe4,age_at_onset
+id,baseline,time_2,time_4,time_6,time_8,baseline_age,sex,education,apoe4,age_at_onset
 1,0.1105487,NA,0.109325197,0.104756131,0.107257697,63.1,male,16,carrier,NA
 2,0.107481183,0.109157373,0.109457839,0.105729713,0.10661845,65.6,male,20,carrier,NA
 3,0.106087034,0.108744509,0.106065035,NA,0.106152357,NA,NA,NA,NA,NA
