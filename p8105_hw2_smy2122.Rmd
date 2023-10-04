@@ -96,7 +96,7 @@ problem_1_df =
 
 # Problem 2
 
-First, I will load the `readxl` package and import and clean the Mr. Trash Wheel dataset. Data cleaning for this dataset involves setting missing values, cleaning the variable names, renaming two existing variables, creating two new variables, and changing the column type for one existing variable.
+First, I will import and clean the Mr. Trash Wheel dataset. Data cleaning for this dataset involves selecting the right range of data, setting missing values, cleaning the variable names, renaming two existing variables, creating two new variables, and changing the column type for one existing variable.
 
 ```{r mr_trash_wheel_df}
 mr_trash_wheel_df =
@@ -120,7 +120,7 @@ mr_trash_wheel_df =
   )
 ```
 
-Second, I will import and clean the Professor Trash Wheel dataset. Data cleaning for this dataset involves setting missing values, cleaning the variable names, renaming two existing variables, and creating two new variables.
+Second, I will import and clean the Professor Trash Wheel dataset. Data cleaning for this dataset involves selecting the right range of data, setting missing values, cleaning the variable names, renaming two existing variables, and creating two new variables.
 
 ```{r prof_trash_wheel_df}
 prof_trash_wheel_df =
@@ -141,7 +141,7 @@ prof_trash_wheel_df =
   )
 ```
 
-Third, I will import and clean the Professor Trash Wheel dataset. Data cleaning for this dataset involves setting missing values, cleaning the variable names, renaming two existing variables, and creating two new variables.
+Third, I will import and clean the Professor Trash Wheel dataset. Data cleaning for this dataset involves selecting the right range of data, setting missing values, cleaning the variable names, renaming two existing variables, and creating two new variables.
 
 ```{r gwynnda_trash_wheel_df}
 gwynnda_trash_wheel_df =
@@ -174,7 +174,7 @@ Each dataset describes trash collected by different trash wheels around Baltimor
 
 # Problem 3
 
-First, I will import and clean the dataset of baseline demographics. Data cleaning for this dataset first involves cleaning the variable names, renaming an existing variable, and recoding two existing variables, and removing participants who do not meet the inclusion criteria.
+First, I will import and clean the dataset of baseline demographics. Data cleaning for this dataset first involves skipping the first row of non-data, setting missing values, cleaning the variable names, renaming an existing variable, and recoding two existing variables, and removing participants who do not meet the inclusion criteria.
 
 ```{r demographics_df}
 demographics_df =
@@ -209,7 +209,7 @@ The above dataset includes basic demographic information of potential and actual
 
 After this process, a total of `r nrow(demographics_df)` participants were recruited or qualified for the observational study. Among these, `r filter(demographics_df, age_at_onset > baseline_age) |> count()` participants developed MCI during the study. The average baseline age of participants who qualified was `r round(mean(pull(demographics_df, baseline_age)), 2)` years old. Additionally, `r round((sum(demographics_df$sex == "female" & demographics_df$apoe4 == "carrier"))/sum(demographics_df$sex == "female")*100, 2)`% of women who qualified for the study were carriers of the APOE4 gene.
 
-Second, I will import and clean the dataset of longitudinally observed biomarker values.
+Second, I will import and clean the dataset of longitudinally observed biomarker values. Data cleaning for this dataset involves skipping the first row of non-data, setting missing values, cleaning the variable names, tidying the data into a longer table, and clarifying category labels, and renaming an existing variable.
 
 ```{r amyloid_df}
 amyloid_df =
